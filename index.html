@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Stock_App</title>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>COMPANY STOCK INFORMATION</h1>
+            <div class="card">
+                <div class="search">
+                    <input type="text" id="search" placeholder="eg.Wipro..">
+                    <button id="btn">Search</button>
+                </div>
+                <div class="info">
+                    <div class="flex">   
+                        <h2>Stock Name:</h2>
+                        <span id="stockName"></span>
+                    </div>
+                   
+                    <div class="flex">
+                        <h2>Country Name:</h2>
+                        <span id="country"></span>
+                    </div>
+                    <div class="flex">
+                        <h2>Currency Name:</h2>
+                        <span id="currency"></span>
+                    </div>
+                    <div class="flex">
+                        <h2>Price:</h2>
+                        <span id="price"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        const search = document.getElementById("search")
+        const button = document.getElementById("btn")
+        const stock_name = document.getElementById("stockName")
+        const country = document.getElementById("country")
+        const price = document.getElementById("price")  
+        const currency = document.getElementById("currency")
+
+        button.addEventListener("click",(e)=>{
+            
+            const stock = search.value
+
+                fetch(`https://alpha-vantage.p.rapidapi.com/query?keywords=${stock}&function=SYMBOL_SEARCH&datatype=json`, {
+                    "method": "GET",
+                    "headers": {
+                        "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
+                        "x-rapidapi-key": "0a58c523efmsh5fa9bfaabaf56ccp15310fjsn187501fba186"
+                    }
+                })
+
+                .then(response=>response.json())
+                .then(data=>{
+
+                    stock_name.innerHTML = data["bestMatches"][0]["2. name" ]
+                    country.innerHTML = data["bestMatches"][0]["4. region" ]
+                    currency.innerHTML = data["bestMatches"][0]["8. currency" ]
+                    const symbol = data["bestMatches"][0]["1. symbol"]
+                    // alert(symbol)
+
+                    fetch(`https://alpha-vantage.p.rapidapi.com/query?function=GLOBAL_QUOTE&symbol=${symbol}&datatype=json`, {
+                        "method": "GET",
+                        "headers": {
+                            "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
+                            "x-rapidapi-key": "0a58c523efmsh5fa9bfaabaf56ccp15310fjsn187501fba186"
+                        }
+                    })
+
+                    .then(res=>res.json())
+                    .then(db=>{
+
+                        price.innerHTML = db["Global Quote"]["05. price"]
+
+                        console.log(db)
+
+                    })
+                   
+                })
+            console.log(stock)
+
+        })
+    </script>
+    
+</body>
+</html>
